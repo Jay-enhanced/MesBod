@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>留言板</title>
+
+    <link href="hairsalon.css" rel="stylesheet" type="text/css"/>
+    <script src="/view/js/jquery-3.2.1.min.js"></script>
+    <script src="/view/js/jquery.form.js"></script>
+    <script src="/view/js/angular.min.js"></script>
+    <script src="/view/js/do_ajax.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div id="container">
+        <div class="topbar">
+            <div style="width:180px; float:left;"></div>
+            <div style="width:100%; float:right;">
+                <div style="height:70px; margin-bottom: 8px;">
+                    <div style="width:260px; float:left; margin-top: 20px;"><span class="toptitle">{{currentuser}}</span>
+                    </div>
+                    <button style="float:right" type="button" onclick="doAjax('/user/logout', 0)">注销</button>
+                </div>
+            </div>
+            <div style="width:100%; float:right;">
+                <form action="/message/add" method="post" id="messageform">
+                    <div style="height:70px; border-style: solid; border-width: 1px; padding: 5px; border-color: #CCCCCC; background-color: #FFFFFF;">
+                        <textarea style="width: 99%" rows="4" name="message"></textarea>
+                    </div>
+                    <div class="bottom">
+                        匿名<input type="radio" name="real" value="1"/>
+                        <button style="float:right" type="submit" class="sub-but">留言</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+                var options = {
+                    success: function (re) {
+                        alert(re);
+                        if (re == "留言成功") {
+                            location.reload();
+                        }
+                        else {
+                            location.href = "login.html";
+                        }
+                    },
+                    error: function (re) {
+                        alert("服务器错误 " + re.status + "，登陆失败！");
+                    }
+                };
+                $("#messageform").ajaxForm(options);
+            });
+        </script>
+
+        <div id="contentarea" ng-repeat="message in messages">
+            <div class="rightcolumn">
+                <div class="column">
+                    <div class="titlebar">
+                        <h1>{{message.username}}</h1>
+                    </div>
+                    <div class="content-inner">
+                        <span class="boxtitle">{{message.message}}</span>
+                        <p>{{message.time | date : 'yyyy-MM-dd hh:mm'}}</p>
+                        <p class="boxtitle">回复： {{message.reply}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var app = angular.module('myApp', []);
+            app.controller('myCtrl', function($scope, $http) {
+                $http.get("/message/replyMess").then(function(response) {
+                    if(response.data == "请登录"){
+                        alert("请您登录！");
+                        location.href = "login.html";
+                        return;
+                    }
+                    $scope.messages = response.data;
+                });
+                $http.get("/user/currentuser").then(function(response) {
+                    $scope.currentuser = response.data;
+                });
+            });
+        </script>
+    </div>
+    <br class="clearboth"/>
+</body>
+</html>

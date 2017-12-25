@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>留言板（管理员）</title>
+    <link href="hairsalon.css" rel="stylesheet" type="text/css"/>
+    <script src="/view/js/jquery-3.2.1.min.js"></script>
+    <script src="/view/js/jquery.form.js"></script>
+    <script src="/view/js/angular.min.js"></script>
+    <script src="/view/js/do_ajax.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div id="container">
+        <div class="topbar">
+            <div style="width:180px; float:left;"></div>
+            <div style="width:100%; float:right;">
+                <div style="height:70px; margin-bottom: 8px;">
+                    <div style="width:260px; float:left;  margin-top: 20px;"><span class="toptitle">{{currentuser}}</span>
+                    </div>
+                    <button style="float:right" type="button" onclick="doAjax('/user/logout',0)">注销</button>
+                </div>
+            </div>
+            <div style="width:100%; float:right;">
+                <form id="managereplyform" method="post" action="/message/add">
+                    <div style="height:70px; border-style: solid; border-width: 1px; padding: 5px; border-color: #CCCCCC; background-color: #FFFFFF;">
+                        <textarea style="width: 99%" rows="4" name="message"></textarea>
+                    </div>
+                    <div class="bottom">
+                        <button style="float:right" type="submit" class="sub-but">留言</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            var options = {
+                success: function (re) {
+                    alert(re);
+                    if (re.indexOf("成功") >= 0) {
+                        location.reload();
+                    } else {
+                        location.href = "login.html";
+                    }
+                },
+                error: function (re) {
+                    alert("服务器错误 " + re.status + "，登陆失败！");
+                }
+            };
+            $(document).ready(function () {
+                $("#managereplyform").ajaxForm(options);
+                setTimeout('$(".replyForm").ajaxForm(options);',3000);
+            });
+        </script>
+
+        <div id="contentarea" ng-repeat="message in messages" my-last-directive>
+            <div class="rightcolumn">
+                <div class="column">
+                    <div class="titlebar">
+                        <h1>{{message.username}}</h1>
+                    </div>
+                    <div class="content-inner">
+                        <span class="boxtitle">{{message.message}}</span>
+                        <p>
+                            {{message.time | date : 'yyyy-MM-dd hh:mm'}}
+                            <button style = "float:right" type="button" value="{{message.id}}" class="sub-but" onclick="doAjax1('/message/delete', this.value)">删除</button>
+                        </p>
+                        <p class="boxtitle" ng-if="message.status==1">回复： {{message.reply}}</p>
+                        <form action="/message/reply" ng-if="message.status==0" class="replyForm" method="post">
+                            <input type="hidden" value="{{message.id}}" name="mess_id"/>
+                            <textarea style="width: 99%" rows="2" name="content"></textarea>
+                            <button type="submit">回复</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var app = angular.module('myApp', []);
+            app.controller('myCtrl', function($scope, $http) {
+                $http.get("/message/all").then(function(response) {
+                    if(response.data == "请登录"){
+                        alert("您不是管理员，请您登录！");
+                        location.href = "login.html";
+                        return;
+                    }
+                    $scope.messages = response.data;
+                });
+                $http.get("/user/currentuser").then(function(response) {
+                    $scope.currentuser = response.data;
+                });
+            });
+//            app.directive('myLastDirective', function() {
+//                return function(scope, element, attrs) {
+//                    if (scope.$last){
+//
+//                    }
+//                };
+//            });
+
+            function doAjax1(url,id) {
+                if(!confirm("确定删除？")) {
+                    return;
+                }
+                $.ajax({
+                    url: url,
+                    data: {
+                        message_id: id
+                    },
+                    type: "POST",
+                    success: function (re) {
+                        alert(re);
+                        location.reload();
+                    },
+                    error: function (re) {
+                        alert("服务器错误： " + re.status);
+                    }
+                });
+            }
+        </script>
+    </div>
+    <br class="clearboth"/>
+</body>
+</html>
