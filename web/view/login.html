@@ -6,7 +6,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>留言板登陆</title>
+<title>留言板登录</title>
 <!-- Meta tag Keywords -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -28,7 +28,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 <div class="w3ls-header">
 	<h1>恭喜您来到这里</h1>
 	<div class="header-main">
-		<h2>欢迎登陆</h2>
+		<h2>欢迎登录</h2>
 			<div class="header-bottom">
 				<div class="header-right w3agile">
 					<div class="header-left-bottom agileinfo">
@@ -42,7 +42,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 								<input type="password" placeholder="密码" name="password" required=""/>
 							</div>
 							<div class="bottom">
-								<button type="submit">登陆</button>
+								<button type="submit">登录</button>
 								<button class="regist_button" onclick="toregist()">注册</button>
 								<!--<a href="regist.html">注册</a>-->
 							</div>
@@ -56,13 +56,13 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 	$(document).ready(function () {
 		var options = {
 			success: function (re) {
-				if (re == "登陆成功") {
+				if (re == "登录成功") {
 					alert(re);
 					location.href = "message.html";
 				} else if(re == "管理员"){
 					alert("欢迎您，管理员！");
 					location.href = "manage.html";
-				}
+				}else alert(re);
 			},
 			error: function (re) {
 				alert("服务器错误 " + re.status + "，登陆失败！");

@@ -44,11 +44,11 @@ public class UserController {
             if(user0.getType() == 1){
                 response.getWriter().print("管理员");
             } else {
-                response.getWriter().print("登陆成功");
+                response.getWriter().print("登录成功");
             }
         }
         else {
-            response.getWriter().print("登陆失败");
+            response.getWriter().print("登录失败");
         }
     }
 
